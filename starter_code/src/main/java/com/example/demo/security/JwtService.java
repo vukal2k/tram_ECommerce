@@ -12,7 +12,8 @@ import java.util.Date;
 public class JwtService {
 
     @Value("${jwt.secret}")
-    private String SECRET_KEY;  // Use a secure secret key!
+    private String SECRET_KEY = "testsecret";  // Use a secure secret key!
+
 
     // Generate a JWT token
     public String generateToken(String username) {
