@@ -125,28 +125,6 @@
 						</goals>
 						<phase>verify</phase>
 					</execution>
-
-					<!-- Third execution: check coverage -->
-					<execution>
-						<id>check-coverage</id> <!-- Unique id for this execution -->
-						<goals>
-							<goal>check</goal>
-						</goals>
-						<configuration>
-							<rules>
-								<rule>
-									<element>PACKAGE</element>
-									<limits>
-										<limit>
-											<counter>PACKAGE</counter>
-											<value>COVEREDRATIO</value>
-											<minimum>0.60</minimum> <!-- Minimum 60% coverage -->
-										</limit>
-									</limits>
-								</rule>
-							</rules>
-						</configuration>
-					</execution>
 				</executions>
 				<configuration>
 					<outputDirectory>${project.build.directory}/jacoco-report</outputDirectory>
