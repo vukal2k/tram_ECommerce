@@ -2,8 +2,12 @@ package com.example.demo.filters;
 
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.example.demo.util.JwtUtil;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
+import org.springframework.stereotype.Service;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import javax.servlet.Filter;
@@ -15,10 +19,14 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-@WebFilter("/api/*")  // Specify the paths you want this filter to apply
-public class JwtAuthenticationFilter extends OncePerRequestFilter {
+
+public class JwtAuthenticationFilter extends BasicAuthenticationFilter {
 
     private JwtUtil jwtUtil = new JwtUtil();  // Assume you have a JwtUtil class for token generation/validation
+
+    public JwtAuthenticationFilter(AuthenticationManager authenticationManager) {
+        super(authenticationManager);
+    }
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {

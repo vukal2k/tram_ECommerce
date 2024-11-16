@@ -2,6 +2,7 @@ package com.example.demo.controllers;
 
 import java.util.Optional;
 
+import javassist.tools.web.BadHttpRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +18,8 @@ import com.example.demo.model.persistence.User;
 import com.example.demo.model.persistence.repositories.CartRepository;
 import com.example.demo.model.persistence.repositories.UserRepository;
 import com.example.demo.model.requests.CreateUserRequest;
+
+import javax.validation.Valid;
 
 @RestController
 @RequestMapping("/api/user")
@@ -40,14 +43,21 @@ public class UserController {
 	}
 	
 	@PostMapping("/create")
-	public ResponseEntity<User> createUser(@RequestBody CreateUserRequest createUserRequest) {
+	public ResponseEntity createUser(@Valid @RequestBody CreateUserRequest createUserRequest) {
 		User user = new User();
 		user.setUsername(createUserRequest.getUsername());
+
+		if (!createUserRequest.getPassword().equals(createUserRequest.getPasswordConfirmation())){
+			return ResponseEntity.badRequest().body("Password field does not match confirm password field");
+		}
+
+		user.setPassword(createUserRequest.getPassword());
+
 		Cart cart = new Cart();
 		cartRepository.save(cart);
 		user.setCart(cart);
 		userRepository.save(user);
 		return ResponseEntity.ok(user);
 	}
-	
+
 }
