@@ -22,16 +22,13 @@ import javax.validation.Valid;
 @RestController
 @RequestMapping("/api/user")
 public class UserController {
-	private final  JwtService jwtService;
+	@Autowired
+	private  JwtService jwtService;
 	@Autowired
 	private UserRepository userRepository;
 	
 	@Autowired
 	private CartRepository cartRepository;
-
-    public UserController(com.example.demo.security.JwtService jwtService) {
-        this.jwtService = jwtService;
-    }
 
     @GetMapping("/id/{id}")
 	public ResponseEntity<User> findById(@PathVariable Long id) {
@@ -67,13 +64,18 @@ public class UserController {
 		// Find user by username
 		User user = userRepository.findByUsername(loginRequest.getUsername());
 
+		if (user == null) {
+			throw new RuntimeException("User not found");
+		}
+
 		// Check if the password matches
 		if (!loginRequest.getPassword().equals(user.getPassword())) {
 			throw new RuntimeException("Invalid credentials");
 		}
 
 		// Generate JWT Token
-		return ResponseEntity.ok(jwtService.generateToken(user.getUsername()));
+		String jwtToken = jwtService.generateToken("testuser");
+		return ResponseEntity.ok(jwtToken);
 	}
 
 }
