@@ -1,13 +1,15 @@
-package com.example.demo.util;
+package com.example.demo.security;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
 
 import java.util.Date;
 
-public class JwtUtil {
+@Service
+public class JwtService {
 
     @Value("${jwt.secret}")
     private String SECRET_KEY;  // Use a secure secret key!

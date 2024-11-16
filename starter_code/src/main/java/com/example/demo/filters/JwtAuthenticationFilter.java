@@ -1,31 +1,24 @@
 package com.example.demo.filters;
 
 import com.auth0.jwt.interfaces.DecodedJWT;
-import com.example.demo.util.JwtUtil;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.example.demo.security.JwtService;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
-import org.springframework.stereotype.Service;
-import org.springframework.web.filter.OncePerRequestFilter;
 
-import javax.servlet.Filter;
 import javax.servlet.FilterChain;
-import javax.servlet.FilterConfig;
 import javax.servlet.ServletException;
-import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 
 public class JwtAuthenticationFilter extends BasicAuthenticationFilter {
-
-    private JwtUtil jwtUtil = new JwtUtil();  // Assume you have a JwtUtil class for token generation/validation
-
-    public JwtAuthenticationFilter(AuthenticationManager authenticationManager) {
+    private final  JwtService jwtService;
+    public JwtAuthenticationFilter(AuthenticationManager authenticationManager, JwtService jwtService1) {
         super(authenticationManager);
+        this.jwtService = jwtService1;
     }
 
     @Override
@@ -35,7 +28,7 @@ public class JwtAuthenticationFilter extends BasicAuthenticationFilter {
         if (token != null) {
             try {
                 // Validate the JWT token
-                DecodedJWT decodedJWT = jwtUtil.validateToken(token);
+                DecodedJWT decodedJWT = jwtService.validateToken(token);
 
                 // Extract the username from the JWT
                 String username = decodedJWT.getSubject();

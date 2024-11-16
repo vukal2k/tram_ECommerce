@@ -1,10 +1,8 @@
 package com.example.demo.controllers;
 
-import java.util.Optional;
-
-import javassist.tools.web.BadHttpRequest;
+import com.example.demo.model.requests.LoginRequest;
+import com.example.demo.security.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -24,14 +22,18 @@ import javax.validation.Valid;
 @RestController
 @RequestMapping("/api/user")
 public class UserController {
-	
+	private final  JwtService jwtService;
 	@Autowired
 	private UserRepository userRepository;
 	
 	@Autowired
 	private CartRepository cartRepository;
 
-	@GetMapping("/id/{id}")
+    public UserController(com.example.demo.security.JwtService jwtService) {
+        this.jwtService = jwtService;
+    }
+
+    @GetMapping("/id/{id}")
 	public ResponseEntity<User> findById(@PathVariable Long id) {
 		return ResponseEntity.of(userRepository.findById(id));
 	}
@@ -58,6 +60,20 @@ public class UserController {
 		user.setCart(cart);
 		userRepository.save(user);
 		return ResponseEntity.ok(user);
+	}
+
+	@PostMapping("/login")
+	public ResponseEntity<String> login(@Valid @RequestBody LoginRequest loginRequest) {
+		// Find user by username
+		User user = userRepository.findByUsername(loginRequest.getUsername());
+
+		// Check if the password matches
+		if (!loginRequest.getPassword().equals(user.getPassword())) {
+			throw new RuntimeException("Invalid credentials");
+		}
+
+		// Generate JWT Token
+		return ResponseEntity.ok(jwtService.generateToken(user.getUsername()));
 	}
 
 }
