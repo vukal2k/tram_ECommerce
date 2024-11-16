@@ -2,6 +2,8 @@ package com.example.demo.controllers;
 
 import com.example.demo.model.requests.LoginRequest;
 import com.example.demo.security.JwtService;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -30,6 +32,8 @@ public class UserController {
 	@Autowired
 	private CartRepository cartRepository;
 
+	private static final Logger logger = LogManager.getLogger(UserController.class);
+
     @GetMapping("/id/{id}")
 	public ResponseEntity<User> findById(@PathVariable Long id) {
 		return ResponseEntity.of(userRepository.findById(id));
@@ -43,20 +47,31 @@ public class UserController {
 	
 	@PostMapping("/create")
 	public ResponseEntity createUser(@Valid @RequestBody CreateUserRequest createUserRequest) {
-		User user = new User();
-		user.setUsername(createUserRequest.getUsername());
+		try {
+			User user = new User();
+			user.setUsername(createUserRequest.getUsername());
 
-		if (!createUserRequest.getPassword().equals(createUserRequest.getPasswordConfirmation())){
-			return ResponseEntity.badRequest().body("Password field does not match confirm password field");
+			if(user.getUsername() == null){
+				throw new Exception("User not found");
+			}
+			if (!createUserRequest.getPassword().equals(createUserRequest.getPasswordConfirmation())){
+				return ResponseEntity.badRequest().body("Password field does not match confirm password field");
+			}
+
+			user.setPassword(createUserRequest.getPassword());
+
+			Cart cart = new Cart();
+			cartRepository.save(cart);
+			user.setCart(cart);
+			userRepository.save(user);
+
+			logger.info("createUser successfully. Username: "+createUserRequest.getUsername());
+
+			return ResponseEntity.ok(user);
+		} catch (Exception e) {
+			logger.error("CreateUser failed: "+e.getMessage());
+			throw new RuntimeException(e);
 		}
-
-		user.setPassword(createUserRequest.getPassword());
-
-		Cart cart = new Cart();
-		cartRepository.save(cart);
-		user.setCart(cart);
-		userRepository.save(user);
-		return ResponseEntity.ok(user);
 	}
 
 	@PostMapping("/login")
