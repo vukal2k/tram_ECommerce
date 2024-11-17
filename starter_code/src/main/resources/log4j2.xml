@@ -29,14 +29,12 @@
     <Loggers>
         <!-- Logger for your application (log INFO and ERROR levels) -->
         <Logger name="com.example.demo" level="info" additivity="false">
-            <AppenderRef ref="appLog" />
             <AppenderRef ref="Console" />
         </Logger>
 
         <!-- Root logger (log INFO and ERROR levels) -->
         <Root level="info">
             <AppenderRef ref="Console" />
-            <AppenderRef ref="appLog" />
         </Root>
     </Loggers>
 </Configuration>
